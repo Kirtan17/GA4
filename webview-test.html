@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebView Detection Test</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f7fa;
+    color: #2d3748;
+    padding: 16px;
+    line-height: 1.5;
+  }
+  .container { max-width: 600px; margin: 0 auto; }
+  h1 {
+    font-size: 22px;
+    margin-bottom: 4px;
+    color: #1a202c;
+  }
+  .subtitle { color: #718096; font-size: 13px; margin-bottom: 20px; }
+
+  .result-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .result-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #718096;
+    margin-bottom: 6px;
+  }
+  .result-value {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge-webview { background: #fed7aa; color: #9a3412; }
+  .badge-browser { background: #bbf7d0; color: #166534; }
+  .badge-inapp { background: #fde68a; color: #92400e; }
+
+  .section {
+    background: white;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .section h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #4a5568;
+    margin-bottom: 10px;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #edf2f7;
+    font-size: 13px;
+  }
+  .row:last-child { border-bottom: none; }
+  .row .key { color: #718096; }
+  .row .val {
+    color: #2d3748;
+    font-weight: 600;
+    text-align: right;
+    word-break: break-word;
+    max-width: 60%;
+  }
+  .check-pass { color: #16a34a; }
+  .check-fail { color: #dc2626; }
+
+  .ua-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 11px;
+    word-break: break-all;
+    color: #78350f;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 8px;
+    cursor: pointer;
+  }
+  button:active { background: #4338ca; }
+
+  .footer {
+    text-align: center;
+    color: #a0aec0;
+    font-size: 11px;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>🔍 WebView Detection Test</h1>
+  <p class="subtitle">HDFC Ergo — Lead Page Environment Check</p>
+
+  <!-- MAIN RESULT -->
+  <div class="result-card">
+    <div class="result-label">Detected Environment</div>
+    <div class="result-value" id="result">Detecting…</div>
+    <span class="badge" id="badge">—</span>
+  </div>
+
+  <!-- DETECTION CHECKS -->
+  <div class="section">
+    <h2>Detection Signals</h2>
+    <div class="row">
+      <span class="key">Android "; wv)" token</span>
+      <span class="val" id="check-android-wv">—</span>
+    </div>
+    <div class="row">
+      <span class="key">iOS device + no Safari token</span>
+      <span class="val" id="check-ios-wv">—</span>
+    </div>
+    <div class="row">
+      <span class="key">Standalone PWA</span>
+      <span class="val" id="check-standalone">—</span>
+    </div>
+    <div class="row">
+      <span class="key">Facebook in-app (FBAN/FBAV)</span>
+      <span class="val" id="check-fb">—</span>
+    </div>
+    <div class="row">
+      <span class="key">Instagram in-app</span>
+      <span class="val" id="check-ig">—</span>
+    </div>
+    <div class="row">
+      <span class="key">LinkedIn in-app</span>
+      <span class="val" id="check-li">—</span>
+    </div>
+    <div class="row">
+      <span class="key">WeChat (MicroMessenger)</span>
+      <span class="val" id="check-wx">—</span>
+    </div>
+  </div>
+
+  <!-- DEVICE INFO -->
+  <div class="section">
+    <h2>Device & Browser</h2>
+    <div class="row"><span class="key">Platform</span><span class="val" id="platform">—</span></div>
+    <div class="row"><span class="key">Vendor</span><span class="val" id="vendor">—</span></div>
+    <div class="row"><span class="key">Language</span><span class="val" id="language">—</span></div>
+    <div class="row"><span class="key">Screen</span><span class="val" id="screen">—</span></div>
+    <div class="row"><span class="key">Viewport</span><span class="val" id="viewport">—</span></div>
+    <div class="row"><span class="key">DPR</span><span class="val" id="dpr">—</span></div>
+    <div class="row"><span class="key">Touch Support</span><span class="val" id="touch">—</span></div>
+    <div class="row"><span class="key">Online</span><span class="val" id="online">—</span></div>
+    <div class="row"><span class="key">Cookies Enabled</span><span class="val" id="cookies">—</span></div>
+  </div>
+
+  <!-- USER AGENT -->
+  <div class="section">
+    <h2>User Agent</h2>
+    <div class="ua-box" id="ua">—</div>
+  </div>
+
+  <!-- CUSTOM APP FLAGS -->
+  <div class="section">
+    <h2>Custom App Flags (if injected)</h2>
+    <div class="row"><span class="key">window.isHDFCErgoApp</span><span class="val" id="flag-app">not set</span></div>
+    <div class="row"><span class="key">window.AndroidBridge</span><span class="val" id="flag-android-bridge">not set</span></div>
+    <div class="row"><span class="key">window.webkit.messageHandlers</span><span class="val" id="flag-ios-bridge">not set</span></div>
+    <div class="row"><span class="key">URL ?source= param</span><span class="val" id="flag-source">not set</span></div>
+  </div>
+
+  <button onclick="copyResults()">📋 Copy All Results</button>
+
+  <div class="footer">Test page for Indixital pixel suppression logic</div>
+
+</div>
+
+<script>
+(function() {
+  const ua = navigator.userAgent || navigator.vendor || '';
+
+  // ============ DETECTION LOGIC ============
+  const checks = {
+    androidWv: /;\s?wv\)/.test(ua),
+    iosWv: /iPad|iPhone|iPod/.test(ua) && !/Safari/.test(ua) && !/CriOS|FxiOS/.test(ua),
+    standalone: window.navigator.standalone === true,
+    fb: /FBAN|FBAV/i.test(ua),
+    ig: /Instagram/i.test(ua),
+    li: /LinkedInApp/i.test(ua),
+    wx: /MicroMessenger/i.test(ua),
+    line: /\bLine\//i.test(ua),
+    snap: /Snapchat/i.test(ua),
+    twitter: /Twitter/i.test(ua)
+  };
+
+  let result, badgeClass;
+  if (checks.standalone) {
+    result = 'Standalone PWA';
+    badgeClass = 'badge-browser';
+  } else if (checks.androidWv) {
+    result = '✅ Android WebView';
+    badgeClass = 'badge-webview';
+  } else if (checks.iosWv) {
+    result = '✅ iOS WebView';
+    badgeClass = 'badge-webview';
+  } else if (checks.fb) {
+    result = '📘 Facebook In-App';
+    badgeClass = 'badge-inapp';
+  } else if (checks.ig) {
+    result = '📷 Instagram In-App';
+    badgeClass = 'badge-inapp';
+  } else if (checks.li) {
+    result = '💼 LinkedIn In-App';
+    badgeClass = 'badge-inapp';
+  } else if (checks.wx) {
+    result = '💬 WeChat In-App';
+    badgeClass = 'badge-inapp';
+  } else if (checks.line) {
+    result = '💚 Line In-App';
+    badgeClass = 'badge-inapp';
+  } else if (checks.snap) {
+    result = '👻 Snapchat In-App';
+    badgeClass = 'badge-inapp';
+  } else if (checks.twitter) {
+    result = '🐦 Twitter In-App';
+    badgeClass = 'badge-inapp';
+  } else {
+    result = '🌐 Regular Browser';
+    badgeClass = 'badge-browser';
+  }
+
+  // ============ RENDER ============
+  const $ = id => document.getElementById(id);
+  const mark = (id, pass) => {
+    $(id).textContent = pass ? '✓ YES' : '✗ no';
+    $(id).className = 'val ' + (pass ? 'check-pass' : 'check-fail');
+  };
+
+  $('result').textContent = result;
+  $('badge').textContent = result.replace(/[^\w\s]/g, '').trim();
+  $('badge').className = 'badge ' + badgeClass;
+
+  mark('check-android-wv', checks.androidWv);
+  mark('check-ios-wv', checks.iosWv);
+  mark('check-standalone', checks.standalone);
+  mark('check-fb', checks.fb);
+  mark('check-ig', checks.ig);
+  mark('check-li', checks.li);
+  mark('check-wx', checks.wx);
+
+  $('platform').textContent = navigator.platform || '—';
+  $('vendor').textContent = navigator.vendor || '—';
+  $('language').textContent = navigator.language || '—';
+  $('screen').textContent = screen.width + ' × ' + screen.height;
+  $('viewport').textContent = window.innerWidth + ' × ' + window.innerHeight;
+  $('dpr').textContent = window.devicePixelRatio || 1;
+  $('touch').textContent = ('ontouchstart' in window) ? '✓ yes' : '✗ no';
+  $('online').textContent = navigator.onLine ? '✓ yes' : '✗ no';
+  $('cookies').textContent = navigator.cookieEnabled ? '✓ yes' : '✗ no';
+  $('ua').textContent = ua;
+
+  // Custom app bridge detection
+  if (typeof window.isHDFCErgoApp !== 'undefined') {
+    $('flag-app').textContent = String(window.isHDFCErgoApp);
+    $('flag-app').className = 'val check-pass';
+  }
+  if (typeof window.AndroidBridge !== 'undefined' || typeof window.Android !== 'undefined') {
+    $('flag-android-bridge').textContent = '✓ present';
+    $('flag-android-bridge').className = 'val check-pass';
+  }
+  if (window.webkit && window.webkit.messageHandlers) {
+    $('flag-ios-bridge').textContent = '✓ present';
+    $('flag-ios-bridge').className = 'val check-pass';
+  }
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('source')) {
+    $('flag-source').textContent = urlParams.get('source');
+    $('flag-source').className = 'val check-pass';
+  }
+
+  // Expose for copy
+  window._testResults = {
+    result: result,
+    userAgent: ua,
+    checks: checks,
+    device: {
+      platform: navigator.platform,
+      vendor: navigator.vendor,
+      language: navigator.language,
+      screen: screen.width + 'x' + screen.height,
+      viewport: window.innerWidth + 'x' + window.innerHeight,
+      dpr: window.devicePixelRatio,
+      touch: 'ontouchstart' in window,
+      online: navigator.onLine,
+      cookies: navigator.cookieEnabled
+    },
+    timestamp: new Date().toISOString()
+  };
+})();
+
+function copyResults() {
+  const text = JSON.stringify(window._testResults, null, 2);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(
+      () => alert('✓ Results copied to clipboard'),
+      () => fallbackCopy(text)
+    );
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); alert('✓ Copied'); }
+  catch(e) { alert('Copy failed — long-press to select manually'); }
+  document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>
